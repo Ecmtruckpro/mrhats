@@ -5,6 +5,66 @@
 const ADMIN_USER = 'admin';
 const ADMIN_PASS = 'mrhats2024';
 
+// Allowed brands (updated)
+const ADMIN_ALLOWED_BRANDS = ['New Era', '31 Hats', 'Dandy Hats', 'Barbas Hats', 'Cash Money Hats', 'Inedit Hats', 'MR Hats Exclusive'];
+
+// ==========================================
+// POLICE SIREN EFFECT (wrong password)
+// ==========================================
+let sirenAudioCtx = null;
+
+function playPoliceSiren() {
+    try {
+        sirenAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = sirenAudioCtx.createOscillator();
+        const gain = sirenAudioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(600, sirenAudioCtx.currentTime);
+        gain.gain.setValueAtTime(0.3, sirenAudioCtx.currentTime);
+
+        // Siren sweep up/down
+        const duration = 3;
+        const steps = 6;
+        for (let i = 0; i < steps; i++) {
+            const t = sirenAudioCtx.currentTime + (i * duration / steps);
+            if (i % 2 === 0) {
+                osc.frequency.linearRampToValueAtTime(1200, t + duration / steps / 2);
+                osc.frequency.linearRampToValueAtTime(600, t + duration / steps);
+            } else {
+                osc.frequency.linearRampToValueAtTime(800, t + duration / steps / 2);
+                osc.frequency.linearRampToValueAtTime(400, t + duration / steps);
+            }
+        }
+        gain.gain.linearRampToValueAtTime(0, sirenAudioCtx.currentTime + duration);
+
+        osc.connect(gain);
+        gain.connect(sirenAudioCtx.destination);
+        osc.start();
+        osc.stop(sirenAudioCtx.currentTime + duration);
+    } catch (e) {
+        // Audio not supported, just do visual
+    }
+}
+
+function triggerPoliceEffect() {
+    const loginBox = document.querySelector('.login-box');
+    const loginPage = document.getElementById('loginPage');
+    if (!loginBox || !loginPage) return;
+
+    // Add police flash class
+    loginPage.classList.add('police-flash');
+    loginBox.classList.add('police-shake');
+
+    // Play siren sound
+    playPoliceSiren();
+
+    // Remove after animation
+    setTimeout(() => {
+        loginPage.classList.remove('police-flash');
+        loginBox.classList.remove('police-shake');
+    }, 3000);
+}
+
 // ==========================================
 // AUTH
 // ==========================================
@@ -35,7 +95,8 @@ function handleLogin(e) {
     showAdmin();
   } else {
     errorEl.style.display = 'block';
-    errorEl.textContent = 'Usuario o contraseña incorrectos';
+    errorEl.textContent = '🚨 ACCESO DENEGADO - Contraseña incorrecta 🚨';
+    triggerPoliceEffect();
   }
 }
 
@@ -101,11 +162,12 @@ function getProductThumb(product) {
   }
   const emojis = {
     'New Era': '🧢',
+    '31 Hats': '🎯',
     'Barbas Hats': '👑',
     'Dandy Hats': '🎩',
-    'Innedit': '💎',
-    'BigBoss': '🔥',
-    'Cash Money': '💰'
+    'Inedit Hats': '💎',
+    'Cash Money Hats': '💰',
+    'MR Hats Exclusive': '🔥'
   };
   return `<span class="admin-thumb-emoji">${emojis[product.brand] || '🧢'}</span>`;
 }
@@ -174,11 +236,16 @@ function removeImage() {
 
 function autoPriceAdmin() {
   const brand = document.getElementById('pBrand').value;
-  if (brand === 'New Era') {
-    document.getElementById('pPrice').value = '25.00';
-  } else {
-    document.getElementById('pPrice').value = '49.99';
-  }
+  const prices = {
+    'New Era': '25.00',
+    '31 Hats': '45.00',
+    'Dandy Hats': '42.00',
+    'Barbas Hats': '39.00',
+    'Cash Money Hats': '48.00',
+    'Inedit Hats': '40.00',
+    'MR Hats Exclusive': '55.00'
+  };
+  document.getElementById('pPrice').value = prices[brand] || '25.00';
 }
 
 // ==========================================

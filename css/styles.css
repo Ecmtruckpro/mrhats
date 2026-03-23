@@ -1087,3 +1087,48 @@ section { padding: 60px 0; }
   object-fit: contain;
   background: var(--gray-100);
 }
+
+/* ===== POLICE SIREN EFFECT ===== */
+@keyframes policeFlash {
+  0%, 100% { background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%); }
+  10% { background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%); }
+  20% { background: linear-gradient(135deg, #0000ff 0%, #0000cc 100%); }
+  30% { background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%); }
+  40% { background: linear-gradient(135deg, #0000ff 0%, #0000cc 100%); }
+  50% { background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%); }
+  60% { background: linear-gradient(135deg, #0000ff 0%, #0000cc 100%); }
+  70% { background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%); }
+  80% { background: linear-gradient(135deg, #0000ff 0%, #0000cc 100%); }
+  90% { background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%); }
+}
+
+@keyframes policeShake {
+  0%, 100% { transform: translateX(0); }
+  10% { transform: translateX(-10px) rotate(-1deg); }
+  20% { transform: translateX(10px) rotate(1deg); }
+  30% { transform: translateX(-10px) rotate(-1deg); }
+  40% { transform: translateX(10px) rotate(1deg); }
+  50% { transform: translateX(-8px) rotate(-1deg); }
+  60% { transform: translateX(8px) rotate(1deg); }
+  70% { transform: translateX(-6px); }
+  80% { transform: translateX(6px); }
+  90% { transform: translateX(-3px); }
+}
+
+.login-page.police-flash {
+  animation: policeFlash 3s ease-in-out;
+}
+
+.login-box.police-shake {
+  animation: policeShake 0.6s ease-in-out 5;
+  box-shadow: 0 0 40px rgba(255, 0, 0, 0.6), 0 0 80px rgba(0, 0, 255, 0.4);
+}
+
+.login-box.police-shake .login-error {
+  background: #ff0000 !important;
+  color: #ffffff !important;
+  font-weight: 700;
+  font-size: 1rem !important;
+  animation: policeFlash 0.3s infinite;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}

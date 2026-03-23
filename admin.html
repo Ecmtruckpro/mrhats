@@ -5,191 +5,313 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MR HATS - Panel de Administración</title>
     <link rel="stylesheet" href="css/styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧢</text></svg>">
 </head>
-<body>
-    <!-- Login Screen -->
-    <div class="admin-login" id="loginScreen">
-        <div class="login-box">
-            <span class="logo-icon">🎩</span>
-            <h2>MR HATS Admin</h2>
-            <p>Ingresa tus credenciales para continuar</p>
-            <div class="login-error" id="loginError">Usuario o contraseña incorrectos</div>
-            <form onsubmit="handleLogin(event)">
-                <div class="form-group">
-                    <input type="text" id="loginUser" placeholder="Usuario" required>
-                </div>
-                <div class="form-group">
-                    <input type="password" id="loginPass" placeholder="Contraseña" required>
-                </div>
-                <button type="submit" class="btn btn-primary btn-full">Iniciar Sesión</button>
-            </form>
-            <p style="margin-top: 20px; font-size: 0.8rem; color: #999;">
-                <a href="index.html" style="color: #D4AF37;">← Volver a la tienda</a>
-            </p>
-        </div>
-    </div>
+<body class="admin-body">
 
-    <!-- Admin Layout -->
-    <div class="admin-layout" id="adminLayout">
-        <!-- Admin Header -->
+<!-- ===== LOGIN PAGE ===== -->
+<div class="login-page" id="loginPage">
+    <div class="login-box">
+        <div style="font-size:3rem;margin-bottom:12px;">🧢</div>
+        <h2>MR HATS</h2>
+        <p class="subtitle">Panel de Administración</p>
+        <div class="login-error" id="loginError"></div>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="loginUser">Usuario</label>
+                <input type="text" id="loginUser" required placeholder="Ingresa tu usuario" autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label for="loginPass">Contraseña</label>
+                <input type="password" id="loginPass" required placeholder="Ingresa tu contraseña" autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn btn-gold" style="width:100%;margin-top:8px;">Iniciar Sesión</button>
+        </form>
+        <p style="margin-top:20px;font-size:0.8rem;color:#757575;">
+            <a href="index.html" style="color:var(--gold);">&larr; Volver a la Tienda</a>
+        </p>
+    </div>
+</div>
+
+<!-- ===== ADMIN APP ===== -->
+<div class="admin-layout" id="adminApp" style="display:none;">
+
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-brand">
+            <h3>🧢 MR HATS</h3>
+            <small>Admin Panel</small>
+        </div>
+        <nav>
+            <a href="#" data-section="dashboard" class="active">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" data-section="products">
+                <span class="nav-icon">🧢</span>
+                <span>Productos</span>
+            </a>
+            <a href="#" data-section="orders">
+                <span class="nav-icon">📦</span>
+                <span>Pedidos</span>
+            </a>
+            <a href="#" data-section="inventory">
+                <span class="nav-icon">📋</span>
+                <span>Inventario</span>
+            </a>
+        </nav>
+        <div class="sidebar-logout">
+            <button id="logoutBtn">🚪 Cerrar Sesión</button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+
         <div class="admin-header">
-            <h2>🎩 MR HATS - Admin Panel</h2>
-            <div class="admin-header-actions">
-                <a href="index.html" class="btn btn-outline btn-sm">Ver Tienda</a>
-                <button class="btn btn-danger btn-sm" onclick="handleLogout()">Cerrar Sesión</button>
+            <h2 id="adminTitle">Dashboard</h2>
+            <a href="index.html" class="btn btn-outline btn-sm">🏪 Ver Tienda</a>
+        </div>
+
+        <!-- ===== DASHBOARD ===== -->
+        <div class="admin-section active" id="section-dashboard">
+            <div class="dashboard-cards">
+                <div class="dash-card">
+                    <div class="card-icon gold">💰</div>
+                    <div class="card-info">
+                        <h3 id="dashRevenue">$0.00</h3>
+                        <p>Ventas Totales</p>
+                    </div>
+                </div>
+                <div class="dash-card">
+                    <div class="card-icon blue">🧢</div>
+                    <div class="card-info">
+                        <h3 id="dashProducts">0</h3>
+                        <p>Total Productos</p>
+                    </div>
+                </div>
+                <div class="dash-card">
+                    <div class="card-icon green">📦</div>
+                    <div class="card-info">
+                        <h3 id="dashOrders">0</h3>
+                        <p>Total Pedidos</p>
+                    </div>
+                </div>
+                <div class="dash-card">
+                    <div class="card-icon red">✅</div>
+                    <div class="card-info">
+                        <h3 id="dashInStock">0</h3>
+                        <p>En Stock</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-panel">
+                <div class="panel-header">
+                    <h3>Pedidos Recientes</h3>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID Pedido</th>
+                                <th>Cliente</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dashRecentOrders">
+                            <tr><td colspan="5" style="text-align:center;color:#757575;padding:24px;">No hay pedidos aún</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <div class="admin-body">
-            <!-- Sidebar -->
-            <div class="admin-sidebar">
-                <button class="admin-nav-item active" onclick="showSection('dashboard', this)">📊 Dashboard</button>
-                <button class="admin-nav-item" onclick="showSection('products', this)">🎩 Productos</button>
-                <button class="admin-nav-item" onclick="showSection('add-product', this)">➕ Agregar Producto</button>
-                <button class="admin-nav-item" onclick="showSection('orders', this)">📦 Pedidos</button>
-                <button class="admin-nav-item" onclick="showSection('inventory', this)">📋 Inventario</button>
-            </div>
-
-            <!-- Content -->
-            <div class="admin-content">
-                <!-- Dashboard -->
-                <div class="admin-section active" id="section-dashboard">
-                    <h2 style="margin-bottom: 24px;">Dashboard</h2>
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <h4>Total Productos</h4>
-                            <div class="stat-value" id="statProducts">0</div>
-                        </div>
-                        <div class="stat-card">
-                            <h4>Total Pedidos</h4>
-                            <div class="stat-value" id="statOrders">0</div>
-                        </div>
-                        <div class="stat-card">
-                            <h4>Ventas Totales</h4>
-                            <div class="stat-value" id="statSales">$0</div>
-                        </div>
-                        <div class="stat-card">
-                            <h4>Productos Agotados</h4>
-                            <div class="stat-value" id="statOutOfStock">0</div>
-                        </div>
-                    </div>
-                    <h3 style="margin-bottom: 16px;">Pedidos Recientes</h3>
-                    <div id="recentOrders"></div>
+        <!-- ===== PRODUCTS ===== -->
+        <div class="admin-section" id="section-products">
+            <div class="admin-panel">
+                <div class="panel-header">
+                    <h3>Todos los Productos</h3>
+                    <button class="btn btn-gold btn-sm" onclick="openProductForm()">+ Agregar Producto</button>
                 </div>
-
-                <!-- Products -->
-                <div class="admin-section" id="section-products">
-                    <div class="admin-toolbar">
-                        <h2>Productos</h2>
-                        <button class="btn btn-primary btn-sm" onclick="showSection('add-product', document.querySelector('.admin-nav-item:nth-child(3)'))">+ Nuevo Producto</button>
-                    </div>
-                    <div id="productsTable"></div>
-                </div>
-
-                <!-- Add/Edit Product -->
-                <div class="admin-section" id="section-add-product">
-                    <h2 style="margin-bottom: 24px;" id="productFormTitle">Agregar Producto</h2>
-                    <div class="admin-form">
-                        <form onsubmit="saveProduct(event)">
-                            <input type="hidden" id="editProductId" value="">
-                            <div class="form-group">
-                                <label>Nombre del Producto *</label>
-                                <input type="text" id="prodName" required placeholder="Ej: 59FIFTY Fitted Yankees">
-                            </div>
-                            <div class="form-group">
-                                <label>Marca *</label>
-                                <select id="prodBrand" required onchange="autoPrice()">
-                                    <option value="">Seleccionar marca</option>
-                                    <option value="New Era">New Era ($25.00)</option>
-                                    <option value="Stetson">Stetson ($49.99)</option>
-                                    <option value="Resistol">Resistol ($49.99)</option>
-                                    <option value="Ariat">Ariat ($49.99)</option>
-                                    <option value="Bailey">Bailey ($49.99)</option>
-                                    <option value="Charlie 1 Horse">Charlie 1 Horse ($49.99)</option>
-                                    <option value="Larry Mahan">Larry Mahan ($49.99)</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Categoría *</label>
-                                <select id="prodCategory" required>
-                                    <option value="">Seleccionar categoría</option>
-                                    <option value="Western">Western / Cowboy</option>
-                                    <option value="Baseball">Baseball / Snapback</option>
-                                    <option value="Dress">Dress Hats</option>
-                                    <option value="Straw">Straw Hats</option>
-                                    <option value="Felt">Felt Hats</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Precio ($) *</label>
-                                <input type="number" id="prodPrice" step="0.01" required placeholder="25.00">
-                            </div>
-                            <div class="form-group">
-                                <label>Descripción</label>
-                                <textarea id="prodDescription" rows="3" placeholder="Descripción del producto..."></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label>Color</label>
-                                <input type="text" id="prodColor" placeholder="Ej: Negro, Café, Natural">
-                            </div>
-                            <div class="form-group">
-                                <label>Emoji (imagen)</label>
-                                <select id="prodImage">
-                                    <option value="🧢">🧢 Gorra</option>
-                                    <option value="🤠">🤠 Cowboy</option>
-                                    <option value="🎩">🎩 Sombrero</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>
-                                    <input type="checkbox" id="prodInStock" checked> En Stock
-                                </label>
-                            </div>
-                            <div style="display: flex; gap: 12px;">
-                                <button type="submit" class="btn btn-primary">Guardar Producto</button>
-                                <button type="button" class="btn btn-outline" onclick="resetProductForm()">Cancelar</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Orders -->
-                <div class="admin-section" id="section-orders">
-                    <h2 style="margin-bottom: 24px;">Pedidos</h2>
-                    <div id="ordersTable"></div>
-                </div>
-
-                <!-- Inventory -->
-                <div class="admin-section" id="section-inventory">
-                    <h2 style="margin-bottom: 24px;">Inventario</h2>
-                    <div id="inventoryTable"></div>
+                <div style="overflow-x:auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Foto</th>
+                                <th>Nombre</th>
+                                <th>Marca</th>
+                                <th>Categoría</th>
+                                <th>Precio</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productsTableBody"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
+
+        <!-- ===== ORDERS ===== -->
+        <div class="admin-section" id="section-orders">
+            <div class="admin-panel">
+                <div class="panel-header">
+                    <h3>Todos los Pedidos</h3>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                                <th>Actualizar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== INVENTORY ===== -->
+        <div class="admin-section" id="section-inventory">
+            <div class="dashboard-cards" style="margin-bottom:24px;">
+                <div class="dash-card">
+                    <div class="card-icon blue">📦</div>
+                    <div class="card-info">
+                        <h3 id="invTotal">0</h3>
+                        <p>Total Productos</p>
+                    </div>
+                </div>
+                <div class="dash-card">
+                    <div class="card-icon green">✅</div>
+                    <div class="card-info">
+                        <h3 id="invInStock">0</h3>
+                        <p>En Stock</p>
+                    </div>
+                </div>
+                <div class="dash-card">
+                    <div class="card-icon red">❌</div>
+                    <div class="card-info">
+                        <h3 id="invOutOfStock">0</h3>
+                        <p>Agotados</p>
+                    </div>
+                </div>
+            </div>
+            <div class="admin-panel">
+                <div class="panel-header">
+                    <h3>Estado del Inventario</h3>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Foto</th>
+                                <th>Producto</th>
+                                <th>Marca</th>
+                                <th>Categoría</th>
+                                <th>Precio</th>
+                                <th>Estado Stock</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- ===== PRODUCT FORM MODAL ===== -->
+<div class="admin-form-modal" id="productFormModal">
+    <div class="modal">
+        <h3 id="productFormTitle">Agregar Producto</h3>
+        <form id="productForm">
+            <!-- Image Upload Section -->
+            <div class="image-upload-section">
+                <label>Foto del Producto</label>
+                <div class="image-upload-area" id="imageUploadArea" onclick="document.getElementById('pImageFile').click()">
+                    <div class="upload-placeholder" id="uploadPlaceholder">
+                        <span style="font-size:2.5rem;">📷</span>
+                        <p>Click para subir foto</p>
+                        <small>JPG, PNG, WebP (máx 2MB)</small>
+                    </div>
+                    <img id="imagePreview" class="image-preview" style="display:none;">
+                </div>
+                <input type="file" id="pImageFile" accept="image/*" style="display:none;" onchange="handleImageUpload(event)">
+                <div style="display:flex;gap:8px;margin-top:8px;">
+                    <button type="button" class="btn btn-sm btn-outline" onclick="document.getElementById('pImageFile').click()">📷 Subir Foto</button>
+                    <button type="button" class="btn btn-sm btn-danger" onclick="removeImage()" id="removeImageBtn" style="display:none;">🗑 Quitar Foto</button>
+                </div>
+                <input type="hidden" id="pImage" value="">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="pName">Nombre del Producto *</label>
+                    <input type="text" id="pName" required placeholder="Ej: 59FIFTY Fitted Black">
+                </div>
+                <div class="form-group">
+                    <label for="pBrand">Marca *</label>
+                    <select id="pBrand" onchange="autoPriceAdmin()">
+                        <option value="New Era">New Era ($25.00)</option>
+                        <option value="31 Hats">31 Hats ($45.00)</option>
+                        <option value="Dandy Hats">Dandy Hats ($42.00)</option>
+                        <option value="Barbas Hats">Barbas Hats ($39.00)</option>
+                        <option value="Cash Money Hats">Cash Money Hats ($48.00)</option>
+                        <option value="Inedit Hats">Inedit Hats ($40.00)</option>
+                        <option value="MR Hats Exclusive">MR Hats Exclusive ($55.00)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="pCategory">Categoría *</label>
+                    <select id="pCategory">
+                        <option value="Fitted">Fitted</option>
+                        <option value="Snapback">Snapback</option>
+                        <option value="Baseball">Baseball</option>
+                        <option value="Streetwear">Streetwear</option>
+                        <option value="Trucker">Trucker</option>
+                        <option value="Premium">Premium</option>
+                        <option value="Colaboración">Colaboración</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="pPrice">Precio ($) *</label>
+                    <input type="number" id="pPrice" step="0.01" min="0" required placeholder="25.00">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="pColor">Color</label>
+                <input type="text" id="pColor" placeholder="Negro, Dorado, etc.">
+            </div>
+            <div class="form-group">
+                <label for="pDescription">Descripción</label>
+                <textarea id="pDescription" rows="3" placeholder="Descripción detallada del producto..."></textarea>
+            </div>
+            <div class="form-group">
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                    <input type="checkbox" id="pInStock" checked style="width:auto;">
+                    En Stock
+                </label>
+            </div>
+            <div style="display:flex;gap:12px;margin-top:8px;">
+                <button type="submit" class="btn btn-gold" style="flex:1;">Guardar Producto</button>
+                <button type="button" class="btn btn-outline" style="flex:1;" onclick="closeProductForm()">Cancelar</button>
+            </div>
+        </form>
     </div>
+</div>
 
-    <!-- Edit Order Modal -->
-    <div class="modal-overlay" id="orderModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3>Actualizar Pedido</h3>
-                <button onclick="closeOrderModal()" class="modal-close">✕</button>
-            </div>
-            <div id="orderDetails"></div>
-            <div class="form-group" style="margin-top: 16px;">
-                <label>Estado del Pedido</label>
-                <select id="orderStatus">
-                    <option value="Pending">Pendiente</option>
-                    <option value="Processing">Procesando</option>
-                    <option value="Shipped">Enviado</option>
-                    <option value="Delivered">Entregado</option>
-                </select>
-            </div>
-            <button class="btn btn-primary" onclick="updateOrderStatus()">Actualizar Estado</button>
-        </div>
-    </div>
-
-    <script src="js/admin.js"></script>
+<script src="js/admin.js"></script>
 </body>
 </html>

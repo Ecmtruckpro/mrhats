@@ -9,8 +9,7 @@ const ADMIN_PASS = 'mrhats2024';
 // AUTH
 // ==========================================
 function checkAuth() {
-  const auth = localStorage.getItem('mrhats_admin_auth');
-  return auth === 'true';
+  return localStorage.getItem('mrhats_admin_auth') === 'true';
 }
 
 function showLogin() {
@@ -36,7 +35,7 @@ function handleLogin(e) {
     showAdmin();
   } else {
     errorEl.style.display = 'block';
-    errorEl.textContent = 'Invalid username or password.';
+    errorEl.textContent = 'Usuario o contraseña incorrectos';
   }
 }
 
@@ -57,12 +56,15 @@ function navigateTo(section) {
   if (sectionEl) sectionEl.classList.add('active');
   if (navEl) navEl.classList.add('active');
 
-  // Update header title
-  const titles = { dashboard: 'Dashboard', products: 'Product Management', orders: 'Order Management', inventory: 'Inventory' };
+  const titles = {
+    dashboard: 'Dashboard',
+    products: 'Gestión de Productos',
+    orders: 'Gestión de Pedidos',
+    inventory: 'Inventario'
+  };
   const headerTitle = document.getElementById('adminTitle');
   if (headerTitle) headerTitle.textContent = titles[section] || 'Dashboard';
 
-  // Refresh section data
   if (section === 'dashboard') loadDashboard();
   if (section === 'products') loadProductsTable();
   if (section === 'orders') loadOrdersTable();
@@ -91,6 +93,95 @@ function saveOrders(orders) {
 }
 
 // ==========================================
+// IMAGE HELPERS
+// ==========================================
+function getProductThumb(product) {
+  if (product.image && product.image.length > 10) {
+    return `<img src="${product.image}" alt="${product.name}" class="admin-thumb">`;
+  }
+  const emojis = {
+    'New Era': '🧢',
+    'Barbas Hats': '👑',
+    'Dandy Hats': '🎩',
+    'Innedit': '💎',
+    'BigBoss': '🔥',
+    'Cash Money': '💰'
+  };
+  return `<span class="admin-thumb-emoji">${emojis[product.brand] || '🧢'}</span>`;
+}
+
+function handleImageUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  // Validate file size (2MB max)
+  if (file.size > 2 * 1024 * 1024) {
+    alert('La imagen es muy grande. Máximo 2MB.');
+    return;
+  }
+
+  // Validate file type
+  if (!file.type.startsWith('image/')) {
+    alert('Solo se permiten archivos de imagen.');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      // Resize image to reduce localStorage usage
+      const canvas = document.createElement('canvas');
+      const maxSize = 400;
+      let w = img.width;
+      let h = img.height;
+
+      if (w > maxSize || h > maxSize) {
+        if (w > h) {
+          h = Math.round(h * maxSize / w);
+          w = maxSize;
+        } else {
+          w = Math.round(w * maxSize / h);
+          h = maxSize;
+        }
+      }
+
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+      document.getElementById('pImage').value = dataUrl;
+      document.getElementById('imagePreview').src = dataUrl;
+      document.getElementById('imagePreview').style.display = 'block';
+      document.getElementById('uploadPlaceholder').style.display = 'none';
+      document.getElementById('removeImageBtn').style.display = 'inline-flex';
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeImage() {
+  document.getElementById('pImage').value = '';
+  document.getElementById('imagePreview').style.display = 'none';
+  document.getElementById('imagePreview').src = '';
+  document.getElementById('uploadPlaceholder').style.display = 'flex';
+  document.getElementById('removeImageBtn').style.display = 'none';
+  document.getElementById('pImageFile').value = '';
+}
+
+function autoPriceAdmin() {
+  const brand = document.getElementById('pBrand').value;
+  if (brand === 'New Era') {
+    document.getElementById('pPrice').value = '25.00';
+  } else {
+    document.getElementById('pPrice').value = '49.99';
+  }
+}
+
+// ==========================================
 // DASHBOARD
 // ==========================================
 function loadDashboard() {
@@ -98,21 +189,16 @@ function loadDashboard() {
   const orders = getOrders();
 
   const totalRevenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
-  const totalProducts = products.length;
-  const totalOrders = orders.length;
-  const inStockCount = products.filter(p => p.inStock).length;
-
   document.getElementById('dashRevenue').textContent = '$' + totalRevenue.toFixed(2);
-  document.getElementById('dashProducts').textContent = totalProducts;
-  document.getElementById('dashOrders').textContent = totalOrders;
-  document.getElementById('dashInStock').textContent = inStockCount;
+  document.getElementById('dashProducts').textContent = products.length;
+  document.getElementById('dashOrders').textContent = orders.length;
+  document.getElementById('dashInStock').textContent = products.filter(p => p.inStock).length;
 
-  // Recent orders
   const recentOrders = orders.slice(-5).reverse();
   const tbody = document.getElementById('dashRecentOrders');
   if (tbody) {
     if (recentOrders.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#757575;padding:24px;">No orders yet</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#757575;padding:24px;">No hay pedidos aún</td></tr>';
     } else {
       tbody.innerHTML = recentOrders.map(o => `
         <tr>
@@ -120,7 +206,7 @@ function loadDashboard() {
           <td>${o.customer?.name || 'N/A'}</td>
           <td>${o.items?.length || 0} items</td>
           <td>$${(o.total || 0).toFixed(2)}</td>
-          <td><span class="status-badge status-${(o.status || 'pending').toLowerCase()}">${o.status || 'Pending'}</span></td>
+          <td><span class="status-badge status-${(o.status || 'pending').toLowerCase()}">${translateStatus(o.status)}</span></td>
         </tr>
       `).join('');
     }
@@ -138,39 +224,56 @@ function loadProductsTable() {
   if (!tbody) return;
 
   if (products.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#757575;padding:24px;">No products. Add one!</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#757575;padding:24px;">No hay productos. ¡Agrega uno!</td></tr>';
     return;
   }
 
   tbody.innerHTML = products.map(p => `
     <tr>
-      <td>${p.image} ${p.id}</td>
+      <td>${getProductThumb(p)}</td>
       <td><strong>${p.name}</strong></td>
       <td>${p.brand}</td>
       <td>${p.category}</td>
       <td>$${p.price.toFixed(2)}</td>
-      <td><span class="status-badge ${p.inStock ? 'status-delivered' : 'status-pending'}">${p.inStock ? 'In Stock' : 'Out'}</span></td>
+      <td><span class="status-badge ${p.inStock ? 'status-delivered' : 'status-pending'}">${p.inStock ? 'En Stock' : 'Agotado'}</span></td>
       <td>
-        <button class="btn btn-sm btn-gold" onclick="editProduct(${p.id})">Edit</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteProduct(${p.id})">Delete</button>
+        <button class="btn btn-sm btn-gold" onclick="editProduct(${p.id})">Editar</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteProduct(${p.id})">Eliminar</button>
       </td>
     </tr>
   `).join('');
 }
 
-function openProductForm(product = null) {
+function openProductForm(product) {
   editingProductId = product ? product.id : null;
   const modal = document.getElementById('productFormModal');
-  document.getElementById('productFormTitle').textContent = product ? 'Edit Product' : 'Add Product';
+  document.getElementById('productFormTitle').textContent = product ? 'Editar Producto' : 'Agregar Producto';
 
   document.getElementById('pName').value = product?.name || '';
   document.getElementById('pBrand').value = product?.brand || 'New Era';
-  document.getElementById('pCategory').value = product?.category || 'Baseball/Snapback';
+  document.getElementById('pCategory').value = product?.category || 'Snapback';
   document.getElementById('pPrice').value = product?.price || '';
   document.getElementById('pColor').value = product?.color || '';
   document.getElementById('pDescription').value = product?.description || '';
-  document.getElementById('pImage').value = product?.image || '🧢';
   document.getElementById('pInStock').checked = product ? product.inStock : true;
+
+  // Handle image
+  const imageVal = product?.image || '';
+  document.getElementById('pImage').value = imageVal;
+  if (imageVal && imageVal.length > 10) {
+    document.getElementById('imagePreview').src = imageVal;
+    document.getElementById('imagePreview').style.display = 'block';
+    document.getElementById('uploadPlaceholder').style.display = 'none';
+    document.getElementById('removeImageBtn').style.display = 'inline-flex';
+  } else {
+    document.getElementById('imagePreview').style.display = 'none';
+    document.getElementById('imagePreview').src = '';
+    document.getElementById('uploadPlaceholder').style.display = 'flex';
+    document.getElementById('removeImageBtn').style.display = 'none';
+  }
+  document.getElementById('pImageFile').value = '';
+
+  if (!product) autoPriceAdmin();
 
   modal.classList.add('open');
 }
@@ -191,12 +294,12 @@ function handleProductForm(e) {
     price: parseFloat(document.getElementById('pPrice').value),
     color: document.getElementById('pColor').value.trim(),
     description: document.getElementById('pDescription').value.trim(),
-    image: document.getElementById('pImage').value.trim() || '🧢',
+    image: document.getElementById('pImage').value,
     inStock: document.getElementById('pInStock').checked
   };
 
   if (!productData.name || isNaN(productData.price)) {
-    alert('Please fill in required fields (name, price).');
+    alert('Por favor llena los campos requeridos (nombre, precio).');
     return;
   }
 
@@ -222,7 +325,7 @@ function editProduct(id) {
 }
 
 function deleteProduct(id) {
-  if (!confirm('Are you sure you want to delete this product?')) return;
+  if (!confirm('¿Estás seguro de eliminar este producto?')) return;
   let products = getProducts();
   products = products.filter(p => p.id !== id);
   saveProducts(products);
@@ -238,16 +341,16 @@ function loadOrdersTable() {
   if (!tbody) return;
 
   if (orders.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#757575;padding:24px;">No orders yet</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#757575;padding:24px;">No hay pedidos aún</td></tr>';
     return;
   }
 
   tbody.innerHTML = orders.slice().reverse().map(o => {
-    const date = new Date(o.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const date = new Date(o.date).toLocaleDateString('es-MX', { month: 'short', day: 'numeric', year: 'numeric' });
     const itemList = (o.items || []).map(i => `${i.name} x${i.quantity}`).join(', ');
     return `
       <tr>
-        <td>#${o.id}</td>
+        <td><strong>#${o.id}</strong></td>
         <td>
           <strong>${o.customer?.name || 'N/A'}</strong><br>
           <small style="color:#757575;">${o.customer?.email || ''}</small>
@@ -255,13 +358,13 @@ function loadOrdersTable() {
         <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${itemList}">${itemList || 'N/A'}</td>
         <td>$${(o.total || 0).toFixed(2)}</td>
         <td>${date}</td>
-        <td><span class="status-badge status-${(o.status || 'pending').toLowerCase()}">${o.status || 'Pending'}</span></td>
+        <td><span class="status-badge status-${(o.status || 'pending').toLowerCase()}">${translateStatus(o.status)}</span></td>
         <td>
           <select onchange="updateOrderStatus(${o.id}, this.value)" style="padding:4px 8px;border-radius:4px;border:1px solid #e0e0e0;font-size:0.8rem;">
-            <option value="Pending" ${o.status === 'Pending' ? 'selected' : ''}>Pending</option>
-            <option value="Processing" ${o.status === 'Processing' ? 'selected' : ''}>Processing</option>
-            <option value="Shipped" ${o.status === 'Shipped' ? 'selected' : ''}>Shipped</option>
-            <option value="Delivered" ${o.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+            <option value="Pending" ${o.status === 'Pending' ? 'selected' : ''}>Pendiente</option>
+            <option value="Processing" ${o.status === 'Processing' ? 'selected' : ''}>Procesando</option>
+            <option value="Shipped" ${o.status === 'Shipped' ? 'selected' : ''}>Enviado</option>
+            <option value="Delivered" ${o.status === 'Delivered' ? 'selected' : ''}>Entregado</option>
           </select>
         </td>
       </tr>
@@ -288,28 +391,20 @@ function loadInventory() {
   const tbody = document.getElementById('inventoryTableBody');
   if (!tbody) return;
 
-  const brands = [...new Set(products.map(p => p.brand))];
-  const summary = brands.map(brand => {
-    const brandProducts = products.filter(p => p.brand === brand);
-    const inStock = brandProducts.filter(p => p.inStock).length;
-    const outOfStock = brandProducts.length - inStock;
-    return { brand, total: brandProducts.length, inStock, outOfStock };
-  });
-
   document.getElementById('invTotal').textContent = products.length;
   document.getElementById('invInStock').textContent = products.filter(p => p.inStock).length;
   document.getElementById('invOutOfStock').textContent = products.filter(p => !p.inStock).length;
 
   tbody.innerHTML = products.map(p => `
     <tr>
-      <td>${p.image}</td>
+      <td>${getProductThumb(p)}</td>
       <td><strong>${p.name}</strong></td>
       <td>${p.brand}</td>
       <td>${p.category}</td>
       <td>$${p.price.toFixed(2)}</td>
       <td>
         <button class="btn btn-sm ${p.inStock ? 'btn-success' : 'btn-danger'}" onclick="toggleStock(${p.id})">
-          ${p.inStock ? '✓ In Stock' : '✗ Out of Stock'}
+          ${p.inStock ? '✓ En Stock' : '✗ Agotado'}
         </button>
       </td>
     </tr>
@@ -327,18 +422,28 @@ function toggleStock(productId) {
 }
 
 // ==========================================
+// HELPERS
+// ==========================================
+function translateStatus(status) {
+  const map = {
+    'Pending': 'Pendiente',
+    'Processing': 'Procesando',
+    'Shipped': 'Enviado',
+    'Delivered': 'Entregado'
+  };
+  return map[status] || status || 'Pendiente';
+}
+
+// ==========================================
 // INIT
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-  // Login form
   const loginForm = document.getElementById('loginForm');
   if (loginForm) loginForm.addEventListener('submit', handleLogin);
 
-  // Product form
   const productForm = document.getElementById('productForm');
   if (productForm) productForm.addEventListener('submit', handleProductForm);
 
-  // Sidebar navigation
   document.querySelectorAll('.admin-sidebar nav a').forEach(link => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
@@ -347,11 +452,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Logout
   const logoutBtn = document.getElementById('logoutBtn');
   if (logoutBtn) logoutBtn.addEventListener('click', logout);
 
-  // Product form modal close
   const productFormModal = document.getElementById('productFormModal');
   if (productFormModal) {
     productFormModal.addEventListener('click', (e) => {
@@ -359,7 +462,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Check auth
   if (checkAuth()) {
     showAdmin();
   } else {

@@ -1,195 +1,306 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MR HATS - Panel de Administración</title>
+    <title>MR HATS - Admin Panel</title>
     <link rel="stylesheet" href="css/styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎩</text></svg>">
 </head>
-<body>
-    <!-- Login Screen -->
-    <div class="admin-login" id="loginScreen">
-        <div class="login-box">
-            <span class="logo-icon">🎩</span>
-            <h2>MR HATS Admin</h2>
-            <p>Ingresa tus credenciales para continuar</p>
-            <div class="login-error" id="loginError">Usuario o contraseña incorrectos</div>
-            <form onsubmit="handleLogin(event)">
-                <div class="form-group">
-                    <input type="text" id="loginUser" placeholder="Usuario" required>
-                </div>
-                <div class="form-group">
-                    <input type="password" id="loginPass" placeholder="Contraseña" required>
-                </div>
-                <button type="submit" class="btn btn-primary btn-full">Iniciar Sesión</button>
-            </form>
-            <p style="margin-top: 20px; font-size: 0.8rem; color: #999;">
-                <a href="index.html" style="color: #D4AF37;">← Volver a la tienda</a>
-            </p>
-        </div>
-    </div>
+<body class="admin-body">
 
-    <!-- Admin Layout -->
-    <div class="admin-layout" id="adminLayout">
-        <!-- Admin Header -->
+<!-- ===== LOGIN PAGE ===== -->
+<div class="login-page" id="loginPage">
+    <div class="login-box">
+        <div class="logo-icon" style="font-size:2rem;">🎩</div>
+        <h2>MR HATS</h2>
+        <p class="subtitle">Admin Panel - Sign In</p>
+        <div class="login-error" id="loginError"></div>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="loginUser">Username</label>
+                <input type="text" id="loginUser" required placeholder="Enter username" autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label for="loginPass">Password</label>
+                <input type="password" id="loginPass" required placeholder="Enter password" autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn btn-gold" style="width:100%;margin-top:8px;">Sign In</button>
+        </form>
+        <p style="margin-top:20px;font-size:0.8rem;color:#757575;">
+            <a href="index.html" style="color:var(--gold);">&larr; Back to Store</a>
+        </p>
+    </div>
+</div>
+
+<!-- ===== ADMIN APP ===== -->
+<div class="admin-layout" id="adminApp" style="display:none;">
+
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-brand">
+            <h3>MR HATS</h3>
+            <small>Admin Panel</small>
+        </div>
+        <nav>
+            <a href="#" data-section="dashboard" class="active">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" data-section="products">
+                <span class="nav-icon">🎩</span>
+                <span>Products</span>
+            </a>
+            <a href="#" data-section="orders">
+                <span class="nav-icon">📦</span>
+                <span>Orders</span>
+            </a>
+            <a href="#" data-section="inventory">
+                <span class="nav-icon">📋</span>
+                <span>Inventory</span>
+            </a>
+        </nav>
+        <div class="sidebar-logout">
+            <button id="logoutBtn">🚪 Logout</button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+
         <div class="admin-header">
-            <h2>🎩 MR HATS - Admin Panel</h2>
-            <div class="admin-header-actions">
-                <a href="index.html" class="btn btn-outline btn-sm">Ver Tienda</a>
-                <button class="btn btn-danger btn-sm" onclick="handleLogout()">Cerrar Sesión</button>
+            <h2 id="adminTitle">Dashboard</h2>
+            <a href="index.html" class="btn btn-outline btn-sm">🏪 View Store</a>
+        </div>
+
+        <!-- ===== DASHBOARD SECTION ===== -->
+        <div class="admin-section active" id="section-dashboard">
+            <div class="dashboard-cards">
+                <div class="dash-card">
+                    <div class="card-icon gold">💰</div>
+                    <div class="card-info">
+                        <h3 id="dashRevenue">$0.00</h3>
+                        <p>Total Revenue</p>
+                    </div>
+                </div>
+                <div class="dash-card">
+                    <div class="card-icon blue">🎩</div>
+                    <div class="card-info">
+                        <h3 id="dashProducts">0</h3>
+                        <p>Total Products</p>
+                    </div>
+                </div>
+                <div class="dash-card">
+                    <div class="card-icon green">📦</div>
+                    <div class="card-info">
+                        <h3 id="dashOrders">0</h3>
+                        <p>Total Orders</p>
+                    </div>
+                </div>
+                <div class="dash-card">
+                    <div class="card-icon red">✅</div>
+                    <div class="card-info">
+                        <h3 id="dashInStock">0</h3>
+                        <p>In Stock Items</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-panel">
+                <div class="panel-header">
+                    <h3>Recent Orders</h3>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dashRecentOrders">
+                            <tr><td colspan="5" style="text-align:center;color:#757575;padding:24px;">No orders yet</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <div class="admin-body">
-            <!-- Sidebar -->
-            <div class="admin-sidebar">
-                <button class="admin-nav-item active" onclick="showSection('dashboard', this)">📊 Dashboard</button>
-                <button class="admin-nav-item" onclick="showSection('products', this)">🎩 Productos</button>
-                <button class="admin-nav-item" onclick="showSection('add-product', this)">➕ Agregar Producto</button>
-                <button class="admin-nav-item" onclick="showSection('orders', this)">📦 Pedidos</button>
-                <button class="admin-nav-item" onclick="showSection('inventory', this)">📋 Inventario</button>
-            </div>
-
-            <!-- Content -->
-            <div class="admin-content">
-                <!-- Dashboard -->
-                <div class="admin-section active" id="section-dashboard">
-                    <h2 style="margin-bottom: 24px;">Dashboard</h2>
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <h4>Total Productos</h4>
-                            <div class="stat-value" id="statProducts">0</div>
-                        </div>
-                        <div class="stat-card">
-                            <h4>Total Pedidos</h4>
-                            <div class="stat-value" id="statOrders">0</div>
-                        </div>
-                        <div class="stat-card">
-                            <h4>Ventas Totales</h4>
-                            <div class="stat-value" id="statSales">$0</div>
-                        </div>
-                        <div class="stat-card">
-                            <h4>Productos Agotados</h4>
-                            <div class="stat-value" id="statOutOfStock">0</div>
-                        </div>
-                    </div>
-                    <h3 style="margin-bottom: 16px;">Pedidos Recientes</h3>
-                    <div id="recentOrders"></div>
+        <!-- ===== PRODUCTS SECTION ===== -->
+        <div class="admin-section" id="section-products">
+            <div class="admin-panel">
+                <div class="panel-header">
+                    <h3>All Products</h3>
+                    <button class="btn btn-gold btn-sm" onclick="openProductForm()">+ Add Product</button>
                 </div>
-
-                <!-- Products -->
-                <div class="admin-section" id="section-products">
-                    <div class="admin-toolbar">
-                        <h2>Productos</h2>
-                        <button class="btn btn-primary btn-sm" onclick="showSection('add-product', document.querySelector('.admin-nav-item:nth-child(3)'))">+ Nuevo Producto</button>
-                    </div>
-                    <div id="productsTable"></div>
-                </div>
-
-                <!-- Add/Edit Product -->
-                <div class="admin-section" id="section-add-product">
-                    <h2 style="margin-bottom: 24px;" id="productFormTitle">Agregar Producto</h2>
-                    <div class="admin-form">
-                        <form onsubmit="saveProduct(event)">
-                            <input type="hidden" id="editProductId" value="">
-                            <div class="form-group">
-                                <label>Nombre del Producto *</label>
-                                <input type="text" id="prodName" required placeholder="Ej: 59FIFTY Fitted Yankees">
-                            </div>
-                            <div class="form-group">
-                                <label>Marca *</label>
-                                <select id="prodBrand" required onchange="autoPrice()">
-                                    <option value="">Seleccionar marca</option>
-                                    <option value="New Era">New Era ($25.00)</option>
-                                    <option value="Stetson">Stetson ($49.99)</option>
-                                    <option value="Resistol">Resistol ($49.99)</option>
-                                    <option value="Ariat">Ariat ($49.99)</option>
-                                    <option value="Bailey">Bailey ($49.99)</option>
-                                    <option value="Charlie 1 Horse">Charlie 1 Horse ($49.99)</option>
-                                    <option value="Larry Mahan">Larry Mahan ($49.99)</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Categoría *</label>
-                                <select id="prodCategory" required>
-                                    <option value="">Seleccionar categoría</option>
-                                    <option value="Western">Western / Cowboy</option>
-                                    <option value="Baseball">Baseball / Snapback</option>
-                                    <option value="Dress">Dress Hats</option>
-                                    <option value="Straw">Straw Hats</option>
-                                    <option value="Felt">Felt Hats</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Precio ($) *</label>
-                                <input type="number" id="prodPrice" step="0.01" required placeholder="25.00">
-                            </div>
-                            <div class="form-group">
-                                <label>Descripción</label>
-                                <textarea id="prodDescription" rows="3" placeholder="Descripción del producto..."></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label>Color</label>
-                                <input type="text" id="prodColor" placeholder="Ej: Negro, Café, Natural">
-                            </div>
-                            <div class="form-group">
-                                <label>Emoji (imagen)</label>
-                                <select id="prodImage">
-                                    <option value="🧢">🧢 Gorra</option>
-                                    <option value="🤠">🤠 Cowboy</option>
-                                    <option value="🎩">🎩 Sombrero</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>
-                                    <input type="checkbox" id="prodInStock" checked> En Stock
-                                </label>
-                            </div>
-                            <div style="display: flex; gap: 12px;">
-                                <button type="submit" class="btn btn-primary">Guardar Producto</button>
-                                <button type="button" class="btn btn-outline" onclick="resetProductForm()">Cancelar</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Orders -->
-                <div class="admin-section" id="section-orders">
-                    <h2 style="margin-bottom: 24px;">Pedidos</h2>
-                    <div id="ordersTable"></div>
-                </div>
-
-                <!-- Inventory -->
-                <div class="admin-section" id="section-inventory">
-                    <h2 style="margin-bottom: 24px;">Inventario</h2>
-                    <div id="inventoryTable"></div>
+                <div style="overflow-x:auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Brand</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productsTableBody"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
+
+        <!-- ===== ORDERS SECTION ===== -->
+        <div class="admin-section" id="section-orders">
+            <div class="admin-panel">
+                <div class="panel-header">
+                    <h3>All Orders</h3>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Update</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== INVENTORY SECTION ===== -->
+        <div class="admin-section" id="section-inventory">
+            <div class="dashboard-cards" style="margin-bottom:24px;">
+                <div class="dash-card">
+                    <div class="card-icon blue">📦</div>
+                    <div class="card-info">
+                        <h3 id="invTotal">0</h3>
+                        <p>Total Products</p>
+                    </div>
+                </div>
+                <div class="dash-card">
+                    <div class="card-icon green">✅</div>
+                    <div class="card-info">
+                        <h3 id="invInStock">0</h3>
+                        <p>In Stock</p>
+                    </div>
+                </div>
+                <div class="dash-card">
+                    <div class="card-icon red">❌</div>
+                    <div class="card-info">
+                        <h3 id="invOutOfStock">0</h3>
+                        <p>Out of Stock</p>
+                    </div>
+                </div>
+            </div>
+            <div class="admin-panel">
+                <div class="panel-header">
+                    <h3>Inventory Status</h3>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Product</th>
+                                <th>Brand</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Stock Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- ===== PRODUCT FORM MODAL ===== -->
+<div class="admin-form-modal" id="productFormModal">
+    <div class="modal">
+        <h3 id="productFormTitle">Add Product</h3>
+        <form id="productForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="pName">Product Name *</label>
+                    <input type="text" id="pName" required placeholder="Hat name">
+                </div>
+                <div class="form-group">
+                    <label for="pBrand">Brand *</label>
+                    <select id="pBrand">
+                        <option value="New Era">New Era</option>
+                        <option value="Stetson">Stetson</option>
+                        <option value="Resistol">Resistol</option>
+                        <option value="Ariat">Ariat</option>
+                        <option value="Bailey">Bailey</option>
+                        <option value="Charlie 1 Horse">Charlie 1 Horse</option>
+                        <option value="Larry Mahan">Larry Mahan</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="pCategory">Category *</label>
+                    <select id="pCategory">
+                        <option value="Western">Western</option>
+                        <option value="Baseball/Snapback">Baseball/Snapback</option>
+                        <option value="Dress">Dress</option>
+                        <option value="Straw">Straw</option>
+                        <option value="Felt">Felt</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="pPrice">Price ($) *</label>
+                    <input type="number" id="pPrice" step="0.01" min="0" required placeholder="25.00">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="pColor">Color</label>
+                    <input type="text" id="pColor" placeholder="Black, Navy, etc.">
+                </div>
+                <div class="form-group">
+                    <label for="pImage">Emoji Icon</label>
+                    <select id="pImage">
+                        <option value="🧢">🧢 Baseball Cap</option>
+                        <option value="🤠">🤠 Cowboy Hat</option>
+                        <option value="🎩">🎩 Top/Dress Hat</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="pDescription">Description</label>
+                <textarea id="pDescription" rows="3" placeholder="Product description..."></textarea>
+            </div>
+            <div class="form-group">
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                    <input type="checkbox" id="pInStock" checked style="width:auto;">
+                    In Stock
+                </label>
+            </div>
+            <div style="display:flex;gap:12px;margin-top:8px;">
+                <button type="submit" class="btn btn-gold" style="flex:1;">Save Product</button>
+                <button type="button" class="btn btn-outline" style="flex:1;" onclick="closeProductForm()">Cancel</button>
+            </div>
+        </form>
     </div>
+</div>
 
-    <!-- Edit Order Modal -->
-    <div class="modal-overlay" id="orderModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3>Actualizar Pedido</h3>
-                <button onclick="closeOrderModal()" class="modal-close">✕</button>
-            </div>
-            <div id="orderDetails"></div>
-            <div class="form-group" style="margin-top: 16px;">
-                <label>Estado del Pedido</label>
-                <select id="orderStatus">
-                    <option value="Pending">Pendiente</option>
-                    <option value="Processing">Procesando</option>
-                    <option value="Shipped">Enviado</option>
-                    <option value="Delivered">Entregado</option>
-                </select>
-            </div>
-            <button class="btn btn-primary" onclick="updateOrderStatus()">Actualizar Estado</button>
-        </div>
-    </div>
-
-    <script src="js/admin.js"></script>
+<script src="js/admin.js"></script>
 </body>
 </html>

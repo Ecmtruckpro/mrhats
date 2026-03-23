@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MR HATS - Premium Hats | San Antonio, TX</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="container header-inner">
+            <div class="logo">
+                <span class="logo-icon">🎩</span>
+                <div>
+                    <h1 class="logo-text">MR HATS</h1>
+                    <span class="logo-tagline">Premium Hats • San Antonio, TX</span>
+                </div>
+            </div>
+            <nav class="nav" id="nav">
+                <a href="#home" class="nav-link active">Inicio</a>
+                <a href="#shop" class="nav-link">Tienda</a>
+                <a href="#about" class="nav-link">Nosotros</a>
+                <a href="#contact" class="nav-link">Contacto</a>
+                <a href="admin.html" class="nav-link nav-admin">Admin</a>
+            </nav>
+            <div class="header-actions">
+                <div class="search-toggle" onclick="toggleSearch()">🔍</div>
+                <div class="cart-toggle" onclick="toggleCart()">
+                    🛒 <span class="cart-count" id="cartCount">0</span>
+                </div>
+                <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+            </div>
+        </div>
+        <!-- Search Bar -->
+        <div class="search-bar" id="searchBar">
+            <div class="container">
+                <input type="text" id="searchInput" placeholder="Buscar sombreros, gorras..." onkeyup="searchProducts()">
+                <button onclick="toggleSearch()">✕</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h2 class="hero-title">Sombreros & Gorras Premium</h2>
+            <p class="hero-subtitle">La mejor selección de sombreros en San Antonio, Texas</p>
+            <div class="hero-prices">
+                <div class="price-badge">
+                    <span class="price-brand">New Era</span>
+                    <span class="price-amount">$25</span>
+                </div>
+                <div class="price-badge">
+                    <span class="price-brand">Stetson, Resistol & más</span>
+                    <span class="price-amount">$49.99</span>
+                </div>
+            </div>
+            <a href="#shop" class="btn btn-primary">Ver Colección</a>
+        </div>
+        <div class="hero-shapes">
+            <div class="shape shape-1">🤠</div>
+            <div class="shape shape-2">🧢</div>
+            <div class="shape shape-3">🎩</div>
+        </div>
+    </section>
+
+    <!-- Featured Brands -->
+    <section class="brands-section">
+        <div class="container">
+            <div class="brands-scroll">
+                <span class="brand-item">NEW ERA</span>
+                <span class="brand-sep">★</span>
+                <span class="brand-item">STETSON</span>
+                <span class="brand-sep">★</span>
+                <span class="brand-item">RESISTOL</span>
+                <span class="brand-sep">★</span>
+                <span class="brand-item">ARIAT</span>
+                <span class="brand-sep">★</span>
+                <span class="brand-item">BAILEY</span>
+                <span class="brand-sep">★</span>
+                <span class="brand-item">CHARLIE 1 HORSE</span>
+                <span class="brand-sep">★</span>
+                <span class="brand-item">LARRY MAHAN</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Shop Section -->
+    <section class="shop-section" id="shop">
+        <div class="container">
+            <h2 class="section-title">Nuestra Colección</h2>
+            <p class="section-subtitle">Encuentra el sombrero perfecto para cada ocasión</p>
+
+            <!-- Filters -->
+            <div class="filters">
+                <div class="filter-group">
+                    <label>Marca:</label>
+                    <select id="filterBrand" onchange="filterProducts()">
+                        <option value="all">Todas las marcas</option>
+                        <option value="New Era">New Era ($25)</option>
+                        <option value="Stetson">Stetson</option>
+                        <option value="Resistol">Resistol</option>
+                        <option value="Ariat">Ariat</option>
+                        <option value="Bailey">Bailey</option>
+                        <option value="Charlie 1 Horse">Charlie 1 Horse</option>
+                        <option value="Larry Mahan">Larry Mahan</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Categoría:</label>
+                    <select id="filterCategory" onchange="filterProducts()">
+                        <option value="all">Todas las categorías</option>
+                        <option value="Western">Western / Cowboy</option>
+                        <option value="Baseball">Baseball / Snapback</option>
+                        <option value="Dress">Dress Hats</option>
+                        <option value="Straw">Straw Hats</option>
+                        <option value="Felt">Felt Hats</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Ordenar:</label>
+                    <select id="filterSort" onchange="filterProducts()">
+                        <option value="name">Nombre A-Z</option>
+                        <option value="price-low">Precio: Menor a Mayor</option>
+                        <option value="price-high">Precio: Mayor a Menor</option>
+                        <option value="brand">Marca</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Products Grid -->
+            <div class="products-grid" id="productsGrid">
+                <!-- Products loaded via JS -->
+            </div>
+
+            <div class="no-results" id="noResults" style="display:none;">
+                <p>No se encontraron productos. Intenta con otros filtros.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about-section" id="about">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-content">
+                    <h2 class="section-title">Sobre MR HATS</h2>
+                    <p>Somos la tienda de sombreros más completa de San Antonio, Texas. Con años de experiencia en el mercado, ofrecemos las mejores marcas a los mejores precios.</p>
+                    <p>Nuestra selección incluye sombreros western, gorras deportivas New Era, sombreros de vestir y mucho más. Cada pieza es seleccionada cuidadosamente para garantizar la mejor calidad.</p>
+                    <div class="about-features">
+                        <div class="feature">
+                            <span class="feature-icon">✓</span>
+                            <span>Marcas Premium Originales</span>
+                        </div>
+                        <div class="feature">
+                            <span class="feature-icon">✓</span>
+                            <span>Los Mejores Precios en San Antonio</span>
+                        </div>
+                        <div class="feature">
+                            <span class="feature-icon">✓</span>
+                            <span>Atención Personalizada</span>
+                        </div>
+                        <div class="feature">
+                            <span class="feature-icon">✓</span>
+                            <span>Envíos a Todo Texas</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-image">
+                    <div class="about-hat-display">
+                        <span>🤠</span>
+                        <div class="about-badge">Since 2010</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section" id="contact">
+        <div class="container">
+            <h2 class="section-title">Contáctanos</h2>
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <span class="contact-icon">📍</span>
+                        <div>
+                            <strong>Dirección</strong>
+                            <p>San Antonio, TX</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-icon">📞</span>
+                        <div>
+                            <strong>Teléfono</strong>
+                            <p>(210) 555-HATS</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-icon">🕐</span>
+                        <div>
+                            <strong>Horario</strong>
+                            <p>Lun - Sáb: 10:00 AM - 8:00 PM</p>
+                            <p>Dom: 11:00 AM - 6:00 PM</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-icon">📧</span>
+                        <div>
+                            <strong>Email</strong>
+                            <p>info@mrhats.com</p>
+                        </div>
+                    </div>
+                </div>
+                <form class="contact-form" onsubmit="submitContactForm(event)">
+                    <h3>Envíanos un mensaje</h3>
+                    <input type="text" placeholder="Nombre completo" required>
+                    <input type="email" placeholder="Email" required>
+                    <input type="tel" placeholder="Teléfono">
+                    <textarea placeholder="Mensaje" rows="4" required></textarea>
+                    <button type="submit" class="btn btn-primary">Enviar Mensaje</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h3>🎩 MR HATS</h3>
+                    <p>Premium Hats • San Antonio, TX</p>
+                    <p>La mejor selección de sombreros y gorras al mejor precio.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Enlaces</h4>
+                    <a href="#home">Inicio</a>
+                    <a href="#shop">Tienda</a>
+                    <a href="#about">Nosotros</a>
+                    <a href="#contact">Contacto</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Marcas</h4>
+                    <a href="#" onclick="quickFilter('New Era')">New Era</a>
+                    <a href="#" onclick="quickFilter('Stetson')">Stetson</a>
+                    <a href="#" onclick="quickFilter('Resistol')">Resistol</a>
+                    <a href="#" onclick="quickFilter('Ariat')">Ariat</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Contacto</h4>
+                    <a href="tel:+12105554287">📞 (210) 555-HATS</a>
+                    <a href="#">📍 San Antonio, TX</a>
+                    <a href="#">🕐 Lun-Sáb 10AM-8PM</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 MR HATS. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3>🛒 Tu Carrito</h3>
+            <button onclick="toggleCart()" class="cart-close">✕</button>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <div class="cart-empty" id="cartEmpty">
+                <p>Tu carrito está vacío</p>
+                <a href="#shop" onclick="toggleCart()" class="btn btn-outline">Ver Productos</a>
+            </div>
+        </div>
+        <div class="cart-footer" id="cartFooter" style="display:none;">
+            <div class="cart-totals">
+                <div class="cart-total-row">
+                    <span>Subtotal:</span>
+                    <span id="cartSubtotal">$0.00</span>
+                </div>
+                <div class="cart-total-row">
+                    <span>Tax (8.25%):</span>
+                    <span id="cartTax">$0.00</span>
+                </div>
+                <div class="cart-total-row cart-total-final">
+                    <span>Total:</span>
+                    <span id="cartTotal">$0.00</span>
+                </div>
+            </div>
+            <button class="btn btn-primary btn-full" onclick="checkout()">Proceder al Pago</button>
+            <button class="btn btn-outline btn-full" onclick="clearCart()">Vaciar Carrito</button>
+        </div>
+    </div>
+
+    <!-- WhatsApp Button -->
+    <a href="https://wa.me/12105554287" class="whatsapp-btn" target="_blank" title="Contáctanos por WhatsApp">
+        💬
+    </a>
+
+    <!-- Checkout Modal -->
+    <div class="modal-overlay" id="checkoutModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Finalizar Pedido</h3>
+                <button onclick="closeCheckout()" class="modal-close">✕</button>
+            </div>
+            <form class="checkout-form" onsubmit="placeOrder(event)">
+                <div class="form-group">
+                    <label>Nombre Completo *</label>
+                    <input type="text" id="checkName" required>
+                </div>
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" id="checkEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Teléfono *</label>
+                    <input type="tel" id="checkPhone" required>
+                </div>
+                <div class="form-group">
+                    <label>Dirección de Envío *</label>
+                    <textarea id="checkAddress" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Método de Pago</label>
+                    <select id="checkPayment">
+                        <option value="cash">Efectivo al recibir</option>
+                        <option value="transfer">Transferencia bancaria</option>
+                        <option value="pickup">Recoger en tienda</option>
+                    </select>
+                </div>
+                <div class="checkout-summary" id="checkoutSummary"></div>
+                <button type="submit" class="btn btn-primary btn-full">Confirmar Pedido</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Order Success Modal -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal modal-success">
+            <div class="success-icon">✅</div>
+            <h3>¡Pedido Confirmado!</h3>
+            <p>Tu pedido <strong id="orderNumber"></strong> ha sido recibido.</p>
+            <p>Te contactaremos pronto para confirmar los detalles.</p>
+            <button class="btn btn-primary" onclick="closeSuccess()">Continuar Comprando</button>
+        </div>
+    </div>
+
+    <script src="js/store.js"></script>
+</body>
+</html>
